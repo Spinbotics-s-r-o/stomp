@@ -744,6 +744,15 @@ bool Stomp::updateParameters()
     return false;
   }
 
+  // There are some little (probably numerical) errors causing values at the beginning and the end of the array to be non-zero.
+  // That is problem because if optimized trajectory starts in the different configuration than the robot is in,
+  // we are sometimes not able to execute trajectory. This errors are in the order of 10^-4 and that can cause
+  // errors at the end of the manipulator in the order of milimeters.
+  for(unsigned int row = 0; row < parameters_updates_.rows(); row++){
+    parameters_updates_(row,0) = 0.0;
+    parameters_updates_(row,parameters_updates_.cols()-1) = 0.0;
+  }
+
   // updating parameters
   parameters_optimized_ += parameters_updates_;
 
